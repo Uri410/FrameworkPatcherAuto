@@ -12,13 +12,14 @@ Refer to the usage section to know how to use this patcher
 
  - All Xiaomi Devices
  - Only A13 - A14 devices are supported
- - use stock framework files (modified files are not supported)
+ - use stock framework files `(modified files are not supported)`
  - recommended to use on CN Hyper OS
 
 ## Usage
 
  - Visit the [Website of FrameworkPatcher](https://jefino9488.github.io/FrameworkPatcher/) 
  - provide the required direct urls of the files
+ - google drive links are not supported
  - use [Android dumps](https://dumps.tadiphone.dev/dumps) url to get versionized zip 
  - give device name, rom verision correctly
  - click on the build button
@@ -31,6 +32,7 @@ Refer to the usage section to know how to use this patcher
  - China Notification Fix
  - Support Gboard keyboard extension
  - Fully Disabled signature verification (core patch)
+ - disable secure flag
 
 ### Further Development
 
