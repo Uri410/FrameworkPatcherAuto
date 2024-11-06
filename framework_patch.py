@@ -227,7 +227,7 @@ def copy_and_replace_files(source_dirs, target_dirs, sub_dirs):
 
 
 def modify_smali_files(directories):
-    core = sys.argv[1].lower() == 'true'
+    #core = sys.argv[1].lower() == 'true'
 
     for directory in directories:
         signing_details = os.path.join(directory, 'android/content/pm/SigningDetails.smali')
@@ -298,3 +298,6 @@ def modify_smali_files(directories):
 if __name__ == "__main__":
     directories = ["classes", "classes2", "classes3", "classes4", "classes5"]
     modify_smali_files(directories)
+    source_dirs = ["assets/SettingsHelper", "assets/Utils"]
+    sub_dirs = ["android/preference", "android/util"]
+    copy_and_replace_files(source_dirs, directories, sub_dirs)
