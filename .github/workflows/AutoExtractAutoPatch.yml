@@ -147,7 +147,7 @@ jobs:
             echo "classes$i directory not found, skipping recompilation."
           fi
         done
-name: Extract framework.jar
+    - name: Extract framework.jar
       run: 7z x framework.jar -oframework
 
     - name: Extract services.jar
