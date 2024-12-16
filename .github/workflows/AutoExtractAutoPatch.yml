@@ -22,6 +22,10 @@ on:
       android_api_level:
         description: 'Android API level'
         required: true
+        type: choice
+        options:
+         - 34
+         - 35
         default: '34'
       core_patch:
         description: 'Core patch'
