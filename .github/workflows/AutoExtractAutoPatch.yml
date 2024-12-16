@@ -26,15 +26,24 @@ on:
         options:
          - 34
          - 35
-        default: '34'
-      core_patch:
-        description: 'Core patch'
+        default: '35'
+      core:
+        description: 'Apply core patch'
         required: true
         type: choice
         options:
-         - apply
-         - do_not_apply
-        default: 'apply'
+          - 'true'
+          - 'false'
+        default: 'false'
+      isCN:
+        description: 'Is CN'
+        required: true
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+        default: 'true'
+      
       # custom_device_name:
       #   description: 'Custom device name (optional)'
       #   required: false
