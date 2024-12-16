@@ -141,12 +141,7 @@ jobs:
         cd smali
         ./gradlew build
 
-    -           if [ -d "classes$i" ]; then
-            java -jar smali.jar a -a ${{ github.event.inputs.android_api_level }} "classes$i" -o "framework/classes$i.dex"
-          else
-            echo "classes$i directory not found, skipping recompilation."
-          fi
-        done
+    
     - name: Extract framework.jar
       run: 7z x framework.jar -oframework
 
