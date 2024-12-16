@@ -12,13 +12,7 @@ android_version=$(echo "$URL" | cut -d'_' -f5 | cut -d'.' -f1)
 build_time=$(date)
 build_utc=$(date -d "$build_time" +%s)
 
-if [[ "$zip_name" == miui_* ]]; then
-  device=$(echo "$zip_name" | cut -d'_' -f2)
-  device=${device,,}
-else
-  echo "Firmware is not supported"
-  exit 1
-fi
+
 
 echo "build_time=$build_time" >>"$GITHUB_ENV"
 echo "version=$os_version" >>"$GITHUB_ENV"
