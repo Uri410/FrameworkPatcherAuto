@@ -24,6 +24,7 @@ on:
         required: true
         type: choice
         options:
+         - 33
          - 34
          - 35
         default: '35'
@@ -146,7 +147,101 @@ jobs:
             echo "classes$i directory not found, skipping recompilation."
           fi
         done
+name: Extract framework.jar
+      run: 7z x framework.jar -oframework
 
+    - name: Extract services.jar
+      run: 7z x services.jar -oservices
+
+    - name: Extract miui-services.jar
+      run: 7z x miui-services.jar -omiui_services
+
+    - name: Extract miui-framework.jar
+      run: 7z x miui-framework.jar -omiui_framework
+
+    - name: Decompile framework dex files if available
+      run: |
+        if [ -f framework/classes.dex ]; then
+          java -jar baksmali.jar d -a ${{ github.event.inputs.android_api_level }} framework/classes.dex -o classes
+        else
+          echo "framework/classes.dex not found, skipping decompilation."
+        fi
+        for i in {2..5}; do
+          if [ -f "framework/classes${i}.dex" ]; then
+            java -jar baksmali.jar d -a ${{ github.event.inputs.android_api_level }} "framework/classes${i}.dex" -o "classes${i}"
+          else
+            echo "framework/classes${i}.dex not found, skipping decompile."
+          fi
+        done
+
+    - name: Decompile services dex files if available
+      run: |
+        if [ -f services/classes.dex ]; then
+          java -jar baksmali.jar d -a ${{ github.event.inputs.android_api_level }} services/classes.dex -o services_classes
+        else
+          echo "services/classes.dex not found, skipping decompilation."
+        fi
+        for i in {2..5}; do
+          if [ -f "services/classes${i}.dex" ]; then
+            java -jar baksmali.jar d -a ${{ github.event.inputs.android_api_level }} "services/classes${i}.dex" -o "services_classes${i}"
+          else
+            echo "services/classes${i}.dex not found, skipping decompile."
+          fi
+        done
+
+    - name: Decompile miui-services dex file
+      run: |
+        java -jar baksmali.jar d -a ${{ github.event.inputs.android_api_level }} miui_services/classes.dex -o miui_services_classes
+
+    - name: Decompile miui-framework dex file
+      run: |
+        java -jar baksmali.jar d -a ${{ github.event.inputs.android_api_level }} miui_framework/classes.dex -o miui_framework_classes
+
+    - name: Backup smali files
+      run: |
+        cp -r classes classes_backup || echo "classes directory not found, skipping backup."
+        cp -r classes2 classes2_backup || echo "classes2 directory not found, skipping backup."
+        cp -r classes3 classes3_backup || echo "classes3 directory not found, skipping backup."
+        cp -r classes4 classes4_backup || echo "classes4 directory not found, skipping backup."
+        cp -r classes5 classes5_backup || echo "classes5 directory not found, skipping backup."
+        cp -r services_classes services_classes_backup || echo "services_classes directory not found, skipping backup."
+        cp -r services_classes2 services_classes2_backup || echo "services_classes2 directory not found, skipping backup."
+        cp -r services_classes3 services_classes3_backup || echo "services_classes3 directory not found, skipping backup."
+        cp -r services_classes4 services_classes4_backup || echo "services_classes4 directory not found, skipping backup."
+        cp -r services_classes5 services_classes5_backup || echo "services_classes5 directory not found, skipping backup."
+        cp -r miui_services_classes miui_services_classes_backup
+        cp -r miui_framework_classes miui_framework_classes_backup
+
+    - name: Modify framework smali
+      run: |
+        python3 framework_patch.py "${{ github.event.inputs.core }}"
+
+    - name: Modify services smali
+      run: |
+        python3 services_patch.py "${{ github.event.inputs.core }}" "${{ github.event.inputs.isCN }}"
+
+    - name: Modify miui-services smali files
+      run: |
+        python3 miui-service_Patch.py
+
+    - name: Modify miui-framework smali files
+      run: |
+        python3 miui-framework_patch.py
+
+    - name: Recompile framework dex files
+      run: |
+        if [ -d classes ]; then
+          java -jar smali.jar a -a ${{ github.event.inputs.android_api_level }} classes -o framework/classes.dex
+        else
+          echo "classes directory not found, skipping recompilation."
+        fi
+        for i in {2..5}; do
+          if [ -d "classes$i" ]; then
+            java -jar smali.jar a -a ${{ github.event.inputs.android_api_level }} "classes$i" -o "framework/classes$i.dex"
+          else
+            echo "classes$i directory not found, skipping recompilation."
+          fi
+        done
     - name: Recompile services dex files
       run: |
         if [ -d services_classes ]; then
@@ -243,7 +338,9 @@ jobs:
         echo "## Release Notes" > release_notes.txt
         echo "- Built modified jars from commit ${{ github.sha }}" >> release_notes.txt
         echo "- Version: ${{ env.version }}" >> release_notes.txt
-        echo "- Core patch applied: ${{ github.event.inputs.core_patch }}" >> release_notes.txt
+        
+        echo "- Core patch: ${{ github.event.inputs.core }}" >> release_notes.txt
+
 
     - name: Upload File
       run: |
